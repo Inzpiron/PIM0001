@@ -5,6 +5,9 @@ import sys
 import os
 import math
 
+def initMatrix(nl, nc, value):
+    return [[value for ii in range(nl)] for jj in range(nc)]
+
 def plot_point(point, angle, length):
      '''
      point - Tuple (x, y)

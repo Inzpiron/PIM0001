@@ -8,53 +8,56 @@ from skimage import data
 from skimage.util import img_as_float
 from skimage.filters import gabor_kernel
 
-def angle_between(p1, p2):
-    ang1 = np.arctan2(*p1[::-1])
-    ang2 = np.arctan2(*p2[::-1])
-    return np.rad2deg((ang1 - ang2) % (2 * np.pi))
+def getSobelMapGxGy(img, operador, i, j):
+    valorGw = 0
 
-def getAngleBySobel(img, operador, i, j):
-    valorGx = 0
-    valorGy = 0
-    for i in range(0, len(img)):
-        for j in range(0, len(img[0])):
-            valorGx += sobelGx[i][j] * img[i][j]
-            valorGy += sobelGy[i][j] * img[i][j]
+    for ii in range(0, len(img)):
+        for jj in range(0, len(img[0])):
+            valorGw += operador[ii][jj] * img[ii][jj]
 
-    ang = int(round(angle_between((0, 0), (valorGy, valorGx))))
+    return valorGw
 
-    return ang
+def getOrientationBySobel(img, operador, i, j):
+    sumGsy = 0
+    sumGsx = 0
+    for ii in range(0, len(img)):
+        for jj in range(0, len(img[0])):
+            sumGsy += 2*mapaGx[ii+i][jj+j]*mapaGy[ii+i][jj+j]
+            sumGsx += pow(mapaGx[ii+i][jj+j], 2) - pow(mapaGy[ii+i][jj+j], 2)
 
-def segmentaBySobel(img, operator, i, j):
-    operator = getOperatorFromAngle(mapa[i][j])
-    #if(mapa[i][j] == 45 or mapa[i][j] == 225):
-    #    return 255
-    valor = 0
-    for i in range(0, len(img)):
-        for j in range(0, len(img[0])):
-            valor += operator[i][j] * img[i][j]
+    if(sumGsx == 0):
+        sumGsx = 1
 
-    valor = normaliza255(valor)
-    return valor
+    print np.matrix(img)
+    print sumGsx
+    print sumGsy
+    phi = 1/2 * np.arctan2(sumGsy,sumGsx)
+    k   = 0
+    if(phi < 0 and sumGsy < 0) or (phi >= 0 and sumGsy > 0):
+        k = 1/2
+    elif(phi < 0 and sumGsy >= 0):
+        k = 1
+    elif(phi >= 0 and sumGsy <= 0):
+        k = 0
+
+    theta = phi + k*math.pi
+    print theta
+    raw_input()
+    return theta
 
 """
 __GLOBAL_VARS__
 """
-mapa    = []
-
-sobelD1 = [(-1, -2,  0),
-           (-2,  0,  2),
-           ( 0,  2,  1)]
-
-sobelD2 = [( 0,  2,  1),
-           (-2,  0,  2),
-           (-1, -2,  0)]
-
-sobelGx = [(-1, -2, -1),
+mapa   = []
+mapaGx = []
+mapaGy = []
+mapaTheta  = []
+gsOperator = initMatrix(9, 9, 1)
+sobelGy = [(-1, -2, -1),
            ( 0,  0,  0),
            ( 1,  2,  1)]
 
-sobelGy = [(-1,  0,  1),
+sobelGx = [(-1,  0,  1),
            (-2,  0,  2),
            (-1,  0,  1)]
 
@@ -66,19 +69,21 @@ tipoImg = sys.argv[1]
 img     = scipy.misc.imread(nomeImg + "." + tipoImg)
 img2    = plt.imread(nomeImg.replace('*', '') + "." + tipoImg)
 
+mapaGy    = convoluir(img, sobelGy, getSobelMapGxGy)
+mapaGx    = convoluir(img, sobelGx, getSobelMapGxGy)
+mapaTheta = convoluir(img, gsOperator, getOrientationBySobel)
+
+print "GO"
 
 
-mapa    = convoluir(img, sobelGx, getAngleBySobel)
-t       = 8
-
-
-vetDotX = []
-vetDotY = []
+'''
+t = 8
 for i in range(0, len(mapa), t):
     for j in range(0, len(mapa[0]), t):
         vet = []
         for k in range(0, t):
             for l in range(0, t):
+
                 vet.append(mapa[i+k][j+l])
 
         #valor = scipy.stats.mode(vet)[0][0]
@@ -86,15 +91,13 @@ for i in range(0, len(mapa), t):
 
         for k in range(0, t):
             for l in range(0, t):
+                if(mapa[i+k][j+l] != -1 and mapa[i+k][j+l] != 90 and mapa[i+k][j+l] != 180):
+                    plot_point((j+l, i+k), mapa[i+k][j+l], 2)
+
                 mapa[i+k][j+l] = valor
-
-        if(i > 10 and i < img.shape[0] - 10 and j > 10 and j < img.shape[1]-10):
-            plot_point((j, i), mapa[i][j], 5)
-
-
-print "a"
 plt.imshow(img2)
 plt.show()
+'''
 
 #data = convoluir(img, sobelGx, segmentaBySobel)
 #scipy.misc.imsave(nomeImg + "*." + tipoImg, data)

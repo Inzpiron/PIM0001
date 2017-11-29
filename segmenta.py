@@ -31,12 +31,9 @@ sobelGy = [(-1, 0, 1),
 """
 __MAIN__
 """
-
 nomeImg = "img/" + sys.argv[2]
 tipoImg = sys.argv[1]
 img  = scipy.misc.imread(nomeImg + "." + tipoImg)
 
 imgGx = convoluir(img, sobelGx, sobel)
-#imgGy = convoluir(img, sobelGy, sobel)
-scipy.misc.imsave(nomeImg + "*Gx." + tipoImg, imgGx)
-#scipy.misc.imsave(nomeImg + "*Gy." + tipoImg, imgGy)
+scipy.misc.imsave(nomeImg + "*." + tipoImg, imgGx)

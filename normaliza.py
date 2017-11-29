@@ -6,6 +6,10 @@ import os
 import math
 from mylib.convolucao import *
 
+def initMatrix(nl, nc, value):
+    mapa = [[value for ii in range(len(nl))] for jj in range(nc))]
+    return mapa
+
 def imgMedia(img):
     result = 0
     for i in range(0, len(img)):
