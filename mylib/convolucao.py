@@ -9,27 +9,16 @@ def initMatrix(nl, nc, value):
     return [[value for ii in range(nl)] for jj in range(nc)]
 
 def plot_point(point, angle, length):
-     '''
-     point - Tuple (x, y)
-     angle - Angle you want your end point at in degrees.
-     length - Length of the line you want to plot.
-
-     Will plot the line on a 10 x 10 plot.
-     '''
-
-     # unpack the first point
      x, y = point
      angle -= 90
-     # find the end point
+
      x1  = length * np.sin(np.deg2rad(angle))
      y1  = length * np.cos(np.deg2rad(angle))
      x1 = int(x1)
      y1 = int(y1)
 
-     #print x, y
-     #print x + x1, y + y1
-     plt.plot([x, x + x1], [y, y + y1], 'C3')
-     plt.plot([x, x - x1], [y, y - y1], 'C3')
+     plt.plot([x, x + x1], [y, y + y1], 'black')
+     plt.plot([x, x - x1], [y, y - y1], 'black')
 
 def angle_between(p1, p2):
     ang1 = np.arctan2(*p1[::-1])

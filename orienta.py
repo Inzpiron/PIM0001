@@ -17,34 +17,6 @@ def getSobelMapGxGy(img, operador, i, j):
 
     return valorGw
 
-def getOrientationBySobel(img, operador, i, j):
-    sumGsy = 0
-    sumGsx = 0
-    for ii in range(0, len(img)):
-        for jj in range(0, len(img[0])):
-            sumGsy += 2*mapaGx[ii+i][jj+j]*mapaGy[ii+i][jj+j]
-            sumGsx += pow(mapaGx[ii+i][jj+j], 2) - pow(mapaGy[ii+i][jj+j], 2)
-
-    if(sumGsx == 0):
-        sumGsx = 1
-
-    print np.matrix(img)
-    print sumGsx
-    print sumGsy
-    phi = 1/2 * np.arctan2(sumGsy,sumGsx)
-    k   = 0
-    if(phi < 0 and sumGsy < 0) or (phi >= 0 and sumGsy > 0):
-        k = 1/2
-    elif(phi < 0 and sumGsy >= 0):
-        k = 1
-    elif(phi >= 0 and sumGsy <= 0):
-        k = 0
-
-    theta = phi + k*math.pi
-    print theta
-    raw_input()
-    return theta
-
 """
 __GLOBAL_VARS__
 """
@@ -52,7 +24,7 @@ mapa   = []
 mapaGx = []
 mapaGy = []
 mapaTheta  = []
-gsOperator = initMatrix(9, 9, 1)
+gsOperator = initMatrix(7, 7, 1)
 sobelGy = [(-1, -2, -1),
            ( 0,  0,  0),
            ( 1,  2,  1)]
@@ -66,44 +38,53 @@ __MAIN__
 """
 nomeImg = "img/" + sys.argv[2]
 tipoImg = sys.argv[1]
-img     = scipy.misc.imread(nomeImg + "." + tipoImg)
-img2    = plt.imread(nomeImg.replace('*', '') + "." + tipoImg)
+Img     = scipy.misc.imread(nomeImg + "." + tipoImg)
+Img2    = plt.imread(nomeImg.replace('*', '') + "." + tipoImg)
 
-mapaGy    = convoluir(img, sobelGy, getSobelMapGxGy)
-mapaGx    = convoluir(img, sobelGx, getSobelMapGxGy)
-mapaTheta = convoluir(img, gsOperator, getOrientationBySobel)
+mapaGy    = convoluir(Img, sobelGy, getSobelMapGxGy)
+mapaGx    = convoluir(Img, sobelGx, getSobelMapGxGy)
+mapaTheta = initMatrix(Img.shape[0], Img.shape[1], -1)
 
-print "GO"
-
-
-'''
 t = 8
-for i in range(0, len(mapa), t):
-    for j in range(0, len(mapa[0]), t):
+for i in range(0, len(Img), t):
+    for j in range(0, len(Img[0]), t):
+        sumGsy = 0
+        sumGsx = 1
         vet = []
-        for k in range(0, t):
-            for l in range(0, t):
+        for ii in range(0, t):
+            for jj in range(0, t):
+                sumGsy += 2 * mapaGx[ii+i][jj+j] * mapaGy[ii+i][jj+j]
+                sumGsx += pow(mapaGx[ii+i][jj+j], 2) - pow(mapaGy[ii+i][jj+j], 2)
+                vet.append(Img[ii+i][jj+j])
 
-                vet.append(mapa[i+k][j+l])
+        if(math.sqrt(np.var(vet)) > 40):
+            phi = 0.5 * np.arctan2(sumGsy, sumGsx)
+            k   = 0
+            if(phi < 0 and sumGsy < 0) or (phi >= 0 and sumGsy > 0):
+                k = 0.5
+            elif(phi < 0 and sumGsy >= 0):
+                k = 1.0
+            elif(phi >= 0 and sumGsy <= 0):
+                k = 0
+            theta = np.rad2deg(phi + k*math.pi)
 
-        #valor = scipy.stats.mode(vet)[0][0]
-        valor = np.average(vet)#scipy.stats.average(vet)#[0][0]
+            if(theta > 0 and theta < 45):
+                theta -= (theta)*2
+            elif(theta > 45 and theta < 90):
+                theta += (90 - theta)*2
+            elif(theta > 90 and theta < 135):
+                theta -= (theta - 90)*2
+            elif(theta > 135 and theta < 180):
+                theta += (180 - theta)*2
+            elif(theta > 180 and theta < 225):
+                theta -= (theta - 180)*2
+            elif(theta > 225 and theta < 270):
+                theta += (270 - theta)*2
+            elif(theta >270 and theta < 315):
+                theta -= (theta - 270)*2
+            elif(theta > 315 and theta < 360):
+                theta += (360 - theta)*2
+            plot_point((j, i), theta, 4)
 
-        for k in range(0, t):
-            for l in range(0, t):
-                if(mapa[i+k][j+l] != -1 and mapa[i+k][j+l] != 90 and mapa[i+k][j+l] != 180):
-                    plot_point((j+l, i+k), mapa[i+k][j+l], 2)
-
-                mapa[i+k][j+l] = valor
-plt.imshow(img2)
+plt.imshow(Img2, alpha = 0.5)
 plt.show()
-'''
-
-#data = convoluir(img, sobelGx, segmentaBySobel)
-#scipy.misc.imsave(nomeImg + "*." + tipoImg, data)
-'''
-imgGx = convoluir(img, sobelGx, sobel)
-#imgGy = convoluir(img, sobelGy, sobel)
-scipy.misc.imsave(nomeImg + "*Gx." + tipoImg, imgGx)
-#scipy.misc.imsave(nomeImg + "*Gy." + tipoImg, imgGy)
-'''
