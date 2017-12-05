@@ -57,7 +57,7 @@ for i in range(0, len(Img), t):
                 sumGsx += pow(mapaGx[ii+i][jj+j], 2) - pow(mapaGy[ii+i][jj+j], 2)
                 vet.append(Img[ii+i][jj+j])
 
-        if(math.sqrt(np.var(vet)) > 40):
+        if(math.sqrt(np.var(vet)) > 30):
             phi = 0.5 * np.arctan2(sumGsy, sumGsx)
             k   = 0
             if(phi < 0 and sumGsy < 0) or (phi >= 0 and sumGsy > 0):
@@ -84,7 +84,7 @@ for i in range(0, len(Img), t):
                 theta -= (theta - 270)*2
             elif(theta > 315 and theta < 360):
                 theta += (360 - theta)*2
-            plot_point((j, i), theta, 4)
+            plot_point((j, i), theta, 3)
 
 plt.imshow(Img2, alpha = 0.5)
 plt.show()
