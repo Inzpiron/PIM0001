@@ -1,8 +1,8 @@
 Trabalho final da disciplina de Processamento de Imagens (Prof. Rogério)
 
 Como baixar:
--$ git clone https://github.com/inzpiron/PIM_fingerprint
--$ cd PIM_fingerprint
+- $ git clone https://github.com/inzpiron/PIM_fingerprint
+- $ cd PIM_fingerprint
 
 Modo de usar  o makefile (main.py):
 -$ python2 main.py {arg1} {arg2} {salvar | buscar} {arg3}
